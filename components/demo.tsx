@@ -7,8 +7,8 @@ import {can,permissions,type Permission} from '@/lib/permissions';
 import {membership,people,tasks} from '@/lib/demo';
 const nav=[{name:'Vista general',icon:LayoutDashboard},{name:'Inventarios',icon:ClipboardCheck},{name:'Equipo y accesos',icon:Users},{name:'Roles y permisos',icon:ShieldCheck},{name:'Organización',icon:Building2},{name:'Hoja de ruta',icon:FolderKanban}];
 function Badge({children}:{children:React.ReactNode}){return <span className="inline-flex items-center gap-1.5 rounded-md bg-[#e9f5ef] px-2.5 py-1 text-[11px] font-semibold text-[#28725b]"><span className="h-1.5 w-1.5 rounded-full bg-current"/>{children}</span>}
-export default function Demo(){
- const [page,setPage]=useState('Vista general'),[company,setCompany]=useState('a'),[warehouse,setWarehouse]=useState('Todos'),[query,setQuery]=useState(''),[status,setStatus]=useState('Todos'),[person,setPerson]=useState('ana'),[permissionQuery,setPermissionQuery]=useState(''),[mobile,setMobile]=useState(false),[detail,setDetail]=useState<string|null>(null);
+export default function Demo({initialPage='Vista general'}:{initialPage?:string}){
+ const [page,setPage]=useState(initialPage),[company,setCompany]=useState('a'),[warehouse,setWarehouse]=useState('Todos'),[query,setQuery]=useState(''),[status,setStatus]=useState('Todos'),[person,setPerson]=useState('ana'),[permissionQuery,setPermissionQuery]=useState(''),[mobile,setMobile]=useState(false),[detail,setDetail]=useState<string|null>(null);
  const filtered=tasks.filter(t=>company==='a'&&(warehouse==='Todos'||t.warehouse===warehouse)&&(status==='Todos'||t.status===status)&&`${t.name} ${t.id} ${t.owner}`.toLowerCase().includes(query.toLowerCase()));
  const member=membership(person,company),currentPerson=people.find(p=>p.id===person)!;
  const resource={organizationId:'demo',companyId:company,warehouseId:warehouse==='Todos'?'Norte':warehouse,assignedUserId:person};

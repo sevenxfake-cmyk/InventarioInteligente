@@ -1,2 +1,2 @@
-import Demo from '@/components/demo';
-export default function Page() { return <Demo/>; }
+import InventoryApp from '@/components/console/inventory-app';
+export default function Page(){return <InventoryApp/>}

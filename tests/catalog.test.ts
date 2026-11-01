@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {validateProduct,validateRack,validateWarehouse,validatePlacement,capacity} from '../lib/console/model.ts';
+import {createSeed} from '../lib/console/seed.ts';
+// Seed has a type-only import, so Node can execute it without framework dependencies.
+test('código único por empresa, incluyendo archivados y variaciones de mayúsculas',()=>{const d=createSeed(),p=d.products[0];assert.throws(()=>validateProduct({...p,id:'new',sku:' mic-001 '},d.products),/código/);assert.doesNotThrow(()=>validateProduct({...p,id:'new',companyId:'company-sur'},d.products));assert.doesNotThrow(()=>validateProduct({...p,name:'Nuevo nombre'},d.products));assert.throws(()=>validateProduct({...p,name:''},d.products),/Completa/)});
+test('no se puede reducir el plano dejando andamios fuera',()=>{const d=createSeed(),w=d.warehouses[0];assert.throws(()=>validateWarehouse({...w,rows:2},d.warehouses),/fuera/);assert.throws(()=>validateWarehouse({...w,columns:1},d.warehouses),/entre 2 y 8/)});
+test('mover un andamio a una casilla ocupada se rechaza',()=>{const d=createSeed(),w=d.warehouses[0];assert.throws(()=>validateRack({...w.racks[0],column:1},w,d.placements),/ocupados/);assert.doesNotThrow(()=>validateRack({...w.racks[0],column:3},w,d.placements))});
+test('niveles y espacios deben ser enteros dentro de límites',()=>{const d=createSeed(),w=d.warehouses[0];assert.throws(()=>validateRack({...w.racks[0],levels:2.5},w,d.placements),/niveles/);assert.throws(()=>validateRack({...w.racks[0],levels:13},w,d.placements),/niveles/)});
+test('reducir niveles con productos ubicados exige reubicación',()=>{const d=createSeed(),w=d.warehouses[0],r=w.racks[0];assert.throws(()=>validateRack({...r,levels:2},w,[{id:'loc',warehouseId:w.id,rackId:r.id,productId:'p1',level:4,slot:1}]),/Reubícalos/)});
+test('un producto puede estar en ubicaciones diferentes pero no compartir una ocupada',()=>{const d=createSeed(),p={...d.placements[0],id:'new'};assert.throws(()=>validatePlacement(p,d),/asignado/);assert.doesNotThrow(()=>validatePlacement({...p,slot:2},d))});
+test('no se ubican productos de otra empresa ni archivados',()=>{const d=createSeed(),p={...d.placements[0],id:'new',slot:2};assert.throws(()=>validatePlacement({...p,productId:'p7'},d),/esta empresa/);d.products[0].archived=true;assert.throws(()=>validatePlacement(p,d),/activo/)});
+test('las posiciones fuera del andamio se rechazan y capacidad se calcula por niveles',()=>{const d=createSeed(),w=d.warehouses[0];assert.throws(()=>validatePlacement({...d.placements[0],id:'new',level:0},d),/fuera/);assert.equal(capacity(w),4*3+3*3+3*2+4*2)});

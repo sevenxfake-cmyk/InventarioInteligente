@@ -1,0 +1,120 @@
+export type Company = {
+    id: string;
+    name: string;
+    legalName: string;
+    ruc: string;
+    industry: string;
+    address: string;
+    email: string;
+    phone: string;
+    color: string;
+    logo: string;
+    cover: string;
+    notes: string;
+};
+export type Product = {
+    id: string;
+    companyId: string;
+    sku: string;
+    barcode: string;
+    name: string;
+    category: string;
+    brand: string;
+    unit: string;
+    presentation: string;
+    description: string;
+    image: string;
+    archived: boolean;
+};
+export type Rack = {
+    id: string;
+    name: string;
+    code: string;
+    row: number;
+    column: number;
+    levels: number;
+    slots: number;
+    color: string;
+};
+export type Warehouse = {
+    id: string;
+    companyId: string;
+    name: string;
+    code: string;
+    address: string;
+    manager: string;
+    rows: number;
+    columns: number;
+    racks: Rack[];
+};
+export type Placement = {
+    id: string;
+    productId: string;
+    warehouseId: string;
+    rackId: string;
+    level: number;
+    slot: number;
+};
+export type Change = {
+    id: string;
+    at: string;
+    description: string;
+    companyId: string;
+};
+export type Draft = {
+    version: 2;
+    revision: number;
+    companies: Company[];
+    products: Product[];
+    warehouses: Warehouse[];
+    placements: Placement[];
+    changes: Change[];
+};
+export function uid() {
+    if (typeof crypto.randomUUID === 'function')
+        return crypto.randomUUID();
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    bytes[6] = (bytes[6] & 15) | 64;
+    bytes[8] = (bytes[8] & 63) | 128;
+    const h = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+    return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
+export function capacity(w: Warehouse) { return w.racks.reduce((n, r) => n + r.levels * r.slots, 0); }
+export function validateProduct(p: Product, products: Product[]) {
+    if (!p.name.trim() || !p.sku.trim())
+        throw new Error('Completa el nombre y el código interno.');
+    if (products.some(x => x.companyId === p.companyId && x.id !== p.id && x.sku.trim().toLowerCase() === p.sku.trim().toLowerCase()))
+        throw new Error('Ese código ya existe en esta empresa, incluso entre archivados.');
+}
+export function validateWarehouse(w: Warehouse, warehouses: Warehouse[]) {
+    if (!w.name.trim() || !w.code.trim())
+        throw new Error('Completa el nombre y código del almacén.');
+    if (!Number.isInteger(w.rows) || !Number.isInteger(w.columns) || w.rows < 2 || w.rows > 8 || w.columns < 2 || w.columns > 8)
+        throw new Error('El plano debe tener entre 2 y 8 filas y columnas.');
+    if (warehouses.some(x => x.id !== w.id && x.companyId === w.companyId && x.code.trim().toLowerCase() === w.code.trim().toLowerCase()))
+        throw new Error('Ya existe un almacén con ese código.');
+    if (w.racks.some(r => r.row >= w.rows || r.column >= w.columns))
+        throw new Error('Hay andamios fuera del nuevo tamaño. Muévelos antes de reducir el plano.');
+}
+export function validateRack(r: Rack, w: Warehouse, placements: Placement[]) {
+    if (!r.name.trim() || !r.code.trim())
+        throw new Error('Indica un nombre y código para el andamio.');
+    if (!Number.isInteger(r.levels) || r.levels < 1 || r.levels > 12 || !Number.isInteger(r.slots) || r.slots < 1 || r.slots > 8)
+        throw new Error('Usa de 1 a 12 niveles y de 1 a 8 espacios por nivel.');
+    if (!Number.isInteger(r.row) || !Number.isInteger(r.column) || r.row < 0 || r.column < 0 || r.row >= w.rows || r.column >= w.columns)
+        throw new Error('La posición está fuera del plano.');
+    if (w.racks.some(x => x.id !== r.id && (x.code.toLowerCase() === r.code.toLowerCase() || (x.row === r.row && x.column === r.column))))
+        throw new Error('El código o la posición ya están ocupados por otro andamio.');
+    if (placements.some(p => p.rackId === r.id && (p.level > r.levels || p.slot > r.slots)))
+        throw new Error('Hay productos en los niveles o espacios que intentas quitar. Reubícalos primero.');
+}
+export function validatePlacement(p: Placement, d: Draft) {
+    const product = d.products.find(x => x.id === p.productId && !x.archived), w = d.warehouses.find(x => x.id === p.warehouseId), rack = w?.racks.find(x => x.id === p.rackId);
+    if (!product || !w || !rack || product.companyId !== w.companyId)
+        throw new Error('Selecciona un producto activo de esta empresa y un andamio válido.');
+    if (!Number.isInteger(p.level) || !Number.isInteger(p.slot) || p.level < 1 || p.level > rack.levels || p.slot < 1 || p.slot > rack.slots)
+        throw new Error('La ubicación está fuera de los niveles o espacios disponibles.');
+    if (d.placements.some(x => x.id !== p.id && x.rackId === p.rackId && x.level === p.level && x.slot === p.slot))
+        throw new Error('Este espacio ya tiene un producto asignado.');
+}
+export function revise(d: Draft, description: string, companyId: string): Draft { return { ...d, revision: d.revision + 1, changes: [{ id: uid(), at: new Date().toISOString(), description, companyId }, ...d.changes].slice(0, 80) }; }
