@@ -22,7 +22,7 @@ Las ubicaciones no contienen cantidades: mover o asignar productos no actualiza 
 
 ## Verificación realizada
 
-- 22 pruebas automatizadas: motor de permisos A–E y validaciones del catálogo, plano y ubicaciones.
+- 29 pruebas automatizadas: motor de permisos A–E y validaciones del catálogo, plano y ubicaciones.
 - TypeScript y compilación Next.js.
 - Navegador: crear producto, recargar y encontrarlo; archivar y restaurar; crear andamio de cinco niveles, moverlo y asignar un producto; cargar logo, guardar y comprobar que se conserva al recargar.
 - No se ha probado en un celular físico ni con base PostgreSQL de producción. El modo offline operativo de trabajadores sigue pendiente.
@@ -40,3 +40,19 @@ La captura incluye los datos ficticios utilizados en las pruebas del navegador.
 ## Actualización v0.3
 
 Se incorporan sucursales, navegación por módulos y adaptación móvil. Los borradores v2 se migran al modelo v3 sin borrar imágenes, productos ni ubicaciones: se crea una sucursal Principal por empresa y se vinculan los almacenes anteriores. La revisión se conserva para seguir detectando ediciones concurrentes. Los datos continúan siendo locales y no representan autorización del servidor. Ver [diseño móvil y Android](mobile-and-android.md).
+
+## Editor de contenido por niveles
+
+Selecciona un andamio en Almacenes y pulsa **Editar contenido**. El editor ancho se adapta a pantalla móvil y permite:
+
+- Desplegar o contraer cada nivel; buscar productos activos por nombre, SKU o código de barras y elegir un resultado con su imagen.
+- Cambiar el producto de una ubicación, moverlo a un nivel con espacio libre y reordenarlo con flechas. Se conservan los identificadores de las ubicaciones al moverlas.
+- Agregar hasta 12 niveles y configurar hasta 8 espacios por nivel. Solo se eliminan niveles vacíos; los superiores se renumeran sin perder asignaciones.
+- Quitar una ubicación conservando la ficha del producto. Los productos archivados ya ubicados siguen visibles y se pueden reubicar, pero no se añaden como nuevas asignaciones.
+- Preparar varios cambios y aplicar **Guardar estructura** en una sola transacción IndexedDB con detección de conflictos. Cerrar o cancelar con cambios muestra la opción de seguir editando o descartar; recargar la pestaña también avisa.
+
+El distintivo **Por contar** describe un conteo físico pendiente; no representa una cantidad calculada ni un módulo de conteo implementado. Se conservan el modelo v3 y los borradores anteriores.
+
+Validación del editor por niveles: búsqueda por SKU, selección, cambio de producto, reordenamiento, cambio de nivel, guardado y recarga, eliminación de ubicación sin cambiar el catálogo, eliminación de nivel vacío, aviso de cambios pendientes y descarte. También se verificó búsqueda y orden en la vista de 390 px, sin desbordamiento horizontal del diálogo. Son pruebas en navegador; no equivalen a pruebas en un teléfono físico.
+
+![Editor por niveles en la vista móvil de prueba](editor-niveles-movil.jpg)

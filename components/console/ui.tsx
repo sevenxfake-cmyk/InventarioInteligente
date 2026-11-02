@@ -1,8 +1,9 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { ImagePlus, Package, Upload, X } from 'lucide-react';
-export function Drawer({ title, subtitle, children, onClose, eyebrow }: {
+export function Drawer({ title, subtitle, children, onClose, eyebrow, wide = false }: {
     title: string;
+    wide?: boolean;
     eyebrow?: string;
     subtitle?: string;
     children: React.ReactNode;
@@ -13,7 +14,7 @@ export function Drawer({ title, subtitle, children, onClose, eyebrow }: {
     return <dialog ref={ref} onCancel={e => { e.preventDefault(); onClose(); }} onClick={e => {
             if (e.target === e.currentTarget)
                 onClose();
-        }} aria-label={title} className="editor-drawer"><div className="flex items-start justify-between gap-4 border-b border-slate-200 px-7 py-6"><div><p className="eyebrow">{eyebrow ?? 'EDITOR DEL ESPACIO DE PRUEBA'}</p><h2 className="mt-2 text-2xl font-bold tracking-tight">{title}</h2>{subtitle && <p className="mt-2 text-sm leading-6 text-slate-500">{subtitle}</p>}</div><button type="button" aria-label="Cerrar editor" onClick={onClose} className="icon-button shrink-0"><X size={20}/></button></div>{children}</dialog>;
+        }} aria-label={title} className={`editor-drawer ${wide ? 'structure-drawer' : ''}`}><div className="flex items-start justify-between gap-4 border-b border-slate-200 px-7 py-6"><div><p className="eyebrow">{eyebrow ?? 'EDITOR DEL ESPACIO DE PRUEBA'}</p><h2 className="mt-2 text-2xl font-bold tracking-tight">{title}</h2>{subtitle && <p className="mt-2 text-sm leading-6 text-slate-500">{subtitle}</p>}</div><button type="button" aria-label="Cerrar editor" onClick={onClose} className="icon-button shrink-0"><X size={20}/></button></div>{children}</dialog>;
 }
 export function Field({ label, children, hint }: {
     label: string;
