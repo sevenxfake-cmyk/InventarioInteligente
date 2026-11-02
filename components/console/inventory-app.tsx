@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowDownToLine, Check, Database, Plus, X } from 'lucide-react';
-import { capacity, revise, validateProduct, validateRack, validateWarehouse, type Company, type Draft, type Product, type Rack, type Warehouse, } from '@/lib/console/model';
+import { revise, validateProduct, validateRack, validateWarehouse, type Company, type Draft, type Product, type Rack, type Warehouse, } from '@/lib/console/model';
 import { applyRackStructure, type RackStructure } from '@/lib/console/rack-structure';
 import { createSeed } from '@/lib/console/seed';
 import { readDraft, writeDraft } from '@/lib/console/storage';

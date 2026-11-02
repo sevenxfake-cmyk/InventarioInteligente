@@ -14,10 +14,6 @@ Puedes explorar los editores sin crear una cuenta. La aplicación inicia con **d
 
 > **Estado: en desarrollo.** Los cambios e imágenes del espacio de prueba se guardan como borradores en el mismo navegador. Todavía no se comparten entre usuarios o dispositivos. El acceso real requiere conectar PostgreSQL y configurar la autenticación.
 
-![Panel con empresa, cargo, sucursal y módulos](docs/erp-desktop-preview.jpg)
-
-*Vista del editor con datos ficticios utilizados durante las pruebas.*
-
 ## Qué puedes hacer
 
 | Módulo | Herramientas disponibles en el espacio de prueba |
@@ -27,14 +23,16 @@ Puedes explorar los editores sin crear una cuenta. La aplicación inicia con **d
 | **Archivo de productos** | Retirar productos del catálogo activo y restaurarlos después, conservando sus ubicaciones. |
 | **Sucursales** | Crear y editar sedes; filtrar sus almacenes sin mezclar empresas. |
 | **Almacenes** | Crear, configurar y eliminar almacenes con confirmación. Diseñar su distribución en un plano visual. |
-| **Andamios y niveles** | Añadir, mover, duplicar y configurar andamios, niveles y espacios. |
-| **Ubicaciones** | Asociar productos a un nivel y espacio, evitando posiciones ocupadas y cruces entre empresas. |
+| **Andamios y niveles** | Añadir, mover, duplicar y configurar andamios y niveles. Cada nivel contiene una lista de productos sin casillas predefinidas. |
+| **Ubicaciones** | Agregar varios productos al mismo nivel, buscar, reordenar y mover entre niveles sin mezclar empresas. |
 | **Actividad** | Consultar los cambios del borrador y descargar una copia de sus datos en JSON. |
 | **Permisos** | Explorar y filtrar ejemplos de acceso por persona, empresa y almacén dentro del mismo diseño en el [laboratorio de permisos](https://inventario-inteligente-snowy.vercel.app/permisos). |
 
 La navegación, permisos, acceso, recuperación y pantallas de carga comparten la identidad visual actual. La antigua demo independiente fue retirada; `/permisos` abre el módulo integrado.
 
-Los formularios advierten si intentas cerrar con cambios sin guardar. Los editores comprueban códigos duplicados, posiciones ocupadas y reducciones de niveles que dejarían productos sin una ubicación válida.
+Cada nivel admite muchos productos distintos. El selector permite añadir varios seguidos y el buscador del andamio ayuda a encontrarlos. Los borradores anteriores se convierten a listas por nivel conservando imágenes e identificadores.
+
+Los formularios advierten si intentas cerrar con cambios sin guardar. Los editores comprueban códigos duplicados, cruces entre empresas y reducciones de niveles que dejarían productos sin una ubicación válida.
 
 ## En qué estamos trabajando
 
@@ -89,7 +87,7 @@ npm run typecheck
 npm run build
 ```
 
-Se incluyen **29 pruebas automatizadas** de permisos y validaciones del catálogo, plano y ubicaciones. Los escenarios A–E verifican reglas de autorización; la integración completa con sesiones, API y PostgreSQL requiere pruebas adicionales.
+Se incluyen **33 pruebas automatizadas** de permisos y validaciones del catálogo, plano y ubicaciones. Los escenarios A–E verifican reglas de autorización; la integración completa con sesiones, API y PostgreSQL requiere pruebas adicionales.
 
 <details>
 <summary><strong>Configurar el acceso real y PostgreSQL</strong></summary>

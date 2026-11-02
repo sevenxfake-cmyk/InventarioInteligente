@@ -33,7 +33,6 @@ export type Rack = {
     row: number;
     column: number;
     levels: number;
-    slots: number;
     color: string;
 };
 export type Branch = {
@@ -61,7 +60,7 @@ export type Placement = {
     warehouseId: string;
     rackId: string;
     level: number;
-    slot: number;
+    position: number;
 };
 export type Change = {
     id: string;
@@ -70,7 +69,7 @@ export type Change = {
     companyId: string;
 };
 export type Draft = {
-    version: 3;
+    version: 4;
     branches: Branch[];
     revision: number;
     companies: Company[];
@@ -88,7 +87,7 @@ export function uid() {
     const h = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
     return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
 }
-export function capacity(w: Warehouse) { return w.racks.reduce((n, r) => n + r.levels * r.slots, 0); }
+export function levelCount(w: Warehouse) { return w.racks.reduce((n, r) => n + r.levels, 0); }
 export function validateProduct(p: Product, products: Product[]) {
     if (!p.name.trim() || !p.sku.trim())
         throw new Error('Completa el nombre y el código interno.');
@@ -108,23 +107,23 @@ export function validateWarehouse(w: Warehouse, warehouses: Warehouse[]) {
 export function validateRack(r: Rack, w: Warehouse, placements: Placement[]) {
     if (!r.name.trim() || !r.code.trim())
         throw new Error('Indica un nombre y código para el andamio.');
-    if (!Number.isInteger(r.levels) || r.levels < 1 || r.levels > 12 || !Number.isInteger(r.slots) || r.slots < 1 || r.slots > 8)
-        throw new Error('Usa de 1 a 12 niveles y de 1 a 8 espacios por nivel.');
+    if (!Number.isInteger(r.levels) || r.levels < 1 || r.levels > 12)
+        throw new Error('Usa de 1 a 12 niveles.');
     if (!Number.isInteger(r.row) || !Number.isInteger(r.column) || r.row < 0 || r.column < 0 || r.row >= w.rows || r.column >= w.columns)
         throw new Error('La posición está fuera del plano.');
     if (w.racks.some(x => x.id !== r.id && (x.code.toLowerCase() === r.code.toLowerCase() || (x.row === r.row && x.column === r.column))))
         throw new Error('El código o la posición ya están ocupados por otro andamio.');
-    if (placements.some(p => p.rackId === r.id && (p.level > r.levels || p.slot > r.slots)))
-        throw new Error('Hay productos en los niveles o espacios que intentas quitar. Reubícalos primero.');
+    if (placements.some(p => p.rackId === r.id && p.level > r.levels))
+        throw new Error('Hay productos en los niveles que intentas quitar. Reubícalos primero.');
 }
 export function validatePlacement(p: Placement, d: Draft) {
     const product = d.products.find(x => x.id === p.productId && !x.archived), w = d.warehouses.find(x => x.id === p.warehouseId), rack = w?.racks.find(x => x.id === p.rackId);
     if (!product || !w || !rack || product.companyId !== w.companyId)
         throw new Error('Selecciona un producto activo de esta empresa y un andamio válido.');
-    if (!Number.isInteger(p.level) || !Number.isInteger(p.slot) || p.level < 1 || p.level > rack.levels || p.slot < 1 || p.slot > rack.slots)
-        throw new Error('La ubicación está fuera de los niveles o espacios disponibles.');
-    if (d.placements.some(x => x.id !== p.id && x.rackId === p.rackId && x.level === p.level && x.slot === p.slot))
-        throw new Error('Este espacio ya tiene un producto asignado.');
+    if (!Number.isInteger(p.level) || !Number.isSafeInteger(p.position) || p.level < 1 || p.level > rack.levels || p.position < 1)
+        throw new Error('El nivel o el orden del producto no es válido.');
+    if (d.placements.some(x => x.id !== p.id && x.rackId === p.rackId && x.level === p.level && x.position === p.position))
+        throw new Error('Dos productos no pueden compartir el mismo orden dentro del nivel.');
 }
 export function revise(d: Draft, description: string, companyId: string): Draft { return { ...d, revision: d.revision + 1, changes: [{ id: uid(), at: new Date().toISOString(), description, companyId }, ...d.changes].slice(0, 80) }; }
 export function validateBranch(branch: Branch, data: Draft) {

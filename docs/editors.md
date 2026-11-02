@@ -1,64 +1,43 @@
 # Editores y diseño de la aplicación
 
-## Disponible en el espacio de prueba
+## Empresas, sucursales y catálogo
 
-- Empresas: crear/editar nombre, RUC opcional, razón social, rubro, dirección, contactos y notas. Logo, portada y color configurables. Tarjetas con número de almacenes y productos.
-- Productos: crear y editar fichas, código único por empresa sin distinguir mayúsculas, fotografía, categoría, marca, código de barras opcional, unidad y presentación. Búsqueda y filtros; tabla o tarjetas; paginación. Eliminar del catálogo activo significa archivar; se puede restaurar y se conservan sus ubicaciones.
-- Almacenes: crear, editar y eliminar con confirmación, estructura independiente por empresa, nombre, código, dirección y responsable de referencia. Plano lógico de 2–8 filas y columnas, sin pretender medidas físicas.
-- Andamios: añadir en una casilla, editar código/nombre/color, 1–12 niveles y 1–8 espacios por nivel; duplicar estructura sin duplicar ubicaciones; mover por arrastre o botón Mover + casilla destino. Eliminar exige confirmación y retira ubicaciones sin borrar productos.
-- Ubicaciones: asociar un producto activo de la misma empresa con un nivel/espacio. No se pueden ocupar dos veces. Un producto puede tener varias ubicaciones. Reducir niveles/espacios ocupados se rechaza y pide reubicar primero.
-- Panel con totales calculados a partir del borrador, guía de configuración, historial local de cambios y descarga JSON del borrador.
-- Formularios con advertencia al cerrar con cambios sin guardar, errores de validación y confirmación únicamente después de guardar.
+- Empresas: crear y editar nombre, razón social, RUC opcional, dirección, contactos, logo, portada y color.
+- Sucursales: crear y editar sedes y filtrar sus almacenes por empresa.
+- Productos: crear y editar fichas con fotografía, código único por empresa, categoría, marca, código de barras, unidad y presentación. Archivar y restaurar conserva las ubicaciones anteriores.
+- Almacenes: crear, editar y eliminar con confirmación. El tamaño del plano se encuentra en **Avanzado · Distribución del plano** y solo distribuye los andamios.
 
-## Persistencia y límites
+## Productos por nivel
 
-Este es un **editor de borradores de prueba**, no un inventario operativo conectado. IndexedDB guarda exclusivamente el espacio de prueba, con nombre y versión independientes. No se usa localStorage para datos ni permisos. Los cambios se conservan en el mismo navegador/origen; no se sincronizan con cuentas, otros dispositivos ni dominios de preview. Borrar los datos del navegador elimina ese borrador.
+Haz clic en un andamio del plano para abrir sus niveles. El nivel es una lista de productos: no hay casillas físicas numeradas ni capacidad de productos que configurar.
 
-Las imágenes JPG/PNG/WebP de hasta 5 MB se decodifican y reducen a 1200 px como máximo para el borrador. No se envían al servidor. No se aceptan SVG ni archivos arbitrarios. El editor permite retirar y reemplazar imágenes. Al conectar producción, las imágenes deberán migrarse a almacenamiento privado de objetos y PostgreSQL guardará referencias, nunca data URLs de fotografías operativas.
+- **Agregar productos** abre una búsqueda por nombre, código o código de barras. Puedes seleccionar varios productos seguidos; cada selección agrega una ficha real a la lista, sin crear primero una fila vacía.
+- El catálogo marca los productos ya añadidos al nivel para evitar agregarlos otra vez desde el selector. Las ubicaciones antiguas se conservan, incluso si incluyen varias referencias al mismo producto.
+- **Buscar productos del andamio** filtra las listas guardadas o preparadas. Al buscar, las flechas de orden se desactivan para evitar reordenar productos que no están visibles.
+- Cada producto permite cambiar la ficha, moverlo a otro nivel, reordenarlo en la lista o quitar su ubicación sin eliminarlo del catálogo.
+- Se configuran de 1 a 12 niveles. Un nivel puede contener muchos productos distintos, sin el límite anterior de ocho espacios. Solo se eliminan niveles vacíos; los superiores se renumeran conservando sus productos.
+- **Guardar distribución** aplica todos los cambios en una transacción local. Cerrar con cambios pendientes permite seguir editando o descartarlos.
 
-El guardado comprueba una revisión dentro de una transacción IndexedDB: otra pestaña con una versión antigua recibe un conflicto y debe recargar, en vez de sobrescribir cambios. La cuota o bloqueo de almacenamiento produce un error y no una confirmación de guardado. El historial mostrado es local y no equivale a una auditoría de servidor autenticada.
+Las cantidades quedan **por contar**. Agregar o mover una ficha no registra un conteo físico ni modifica existencias. El orden de la lista es independiente de la cantidad y del tamaño del andamio.
 
-Las ubicaciones no contienen cantidades: mover o asignar productos no actualiza stock ni registra conteos. Los permisos de acceso real no provienen del borrador. La autenticación y las APIs protegidas mantienen su separación.
+El panel muestra niveles, ubicaciones y qué parte del catálogo activo tiene alguna ubicación en el contexto seleccionado. No calcula capacidad física ni “espacios libres” a partir de una cuadrícula.
 
-## Verificación realizada
+## Guardado y migración
 
-- 29 pruebas automatizadas: motor de permisos A–E y validaciones del catálogo, plano y ubicaciones.
-- TypeScript y compilación Next.js.
-- Navegador: crear producto, recargar y encontrarlo; archivar y restaurar; crear andamio de cinco niveles, moverlo y asignar un producto; cargar logo, guardar y comprobar que se conserva al recargar.
-- No se ha probado en un celular físico ni con base PostgreSQL de producción. El modo offline operativo de trabajadores sigue pendiente.
+IndexedDB conserva este borrador en el mismo navegador y origen. Los datos e imágenes todavía no se sincronizan entre dispositivos. Las fotografías JPG/PNG/WebP de hasta 5 MB se reducen a 1200 px para este espacio de prueba.
 
-## Próxima integración
+El modelo v4 convierte los borradores v2 y v3 a listas por nivel. Conserva empresas, sucursales, productos, imágenes, almacenes, andamios, ubicaciones, historial e identificadores. `slot` se transforma en `position`, como orden interno; `Rack.slots` deja de existir. No se deduplican ni descartan ubicaciones. La revisión se conserva y el primer guardado usa la detección de conflictos existente. Se mantiene el mismo nombre de almacenamiento para encontrar los borradores anteriores.
 
-Conectar los editores a casos de uso del servidor con permisos `products.create/edit/archive`, `warehouses.manage` y `placements.manage`, ámbitos por empresa y almacén, control de versiones y auditoría transaccional. Las fotografías requieren un proveedor de objetos. La edición colaborativa real no debe activarse usando el borrador del navegador como base principal.
+Una revisión antigua en otra pestaña no puede sobrescribir un guardado más reciente. Los errores de formato o cuota se muestran y no sustituyen silenciosamente el borrador.
 
-## Actualización v0.3
+## Diseño y acceso
 
-Se incorporan sucursales, navegación por módulos y adaptación móvil. Los borradores v2 se migran al modelo v3 sin borrar imágenes, productos ni ubicaciones: se crea una sucursal Principal por empresa y se vinculan los almacenes anteriores. La revisión se conserva para seguir detectando ediciones concurrentes. Los datos continúan siendo locales y no representan autorización del servidor. Ver [diseño móvil y Android](mobile-and-android.md).
+Permisos usa el mismo contenedor azul de los editores. `/permisos` abre `/#permissions`; la antigua demo independiente fue retirada. Ingreso, recuperación, carga, errores y página no encontrada comparten marca y controles.
 
-## Editor de contenido por niveles
+El laboratorio de permisos contiene escenarios ficticios y no cambia cuentas reales. El acceso autenticado y las APIs protegidas siguen separados del borrador local; requieren PostgreSQL y configuración de autenticación.
 
-Haz clic en un andamio del plano de Almacenes para abrir directamente sus niveles. Al cerrar el editor, puedes volver a entrar con **Abrir niveles**, junto al plano. El editor ancho se adapta a pantalla móvil y permite:
+## Comprobaciones
 
-- Desplegar o contraer cada nivel; buscar productos activos por nombre, SKU o código de barras y elegir un resultado con su imagen.
-- Cambiar el producto de una ubicación, moverlo a un nivel con espacio libre y reordenarlo con flechas. Se conservan los identificadores de las ubicaciones al moverlas.
-- Agregar hasta 12 niveles y configurar hasta 8 espacios por nivel. Solo se eliminan niveles vacíos; los superiores se renumeran sin perder asignaciones.
-- Quitar una ubicación conservando la ficha del producto. Los productos archivados ya ubicados siguen visibles y se pueden reubicar, pero no se añaden como nuevas asignaciones.
-- Preparar varios cambios y aplicar **Guardar estructura** en una sola transacción IndexedDB con detección de conflictos. Cerrar o cancelar con cambios muestra la opción de seguir editando o descartar; recargar la pestaña también avisa.
+33 pruebas automatizadas cubren permisos, validaciones, migraciones v2/v3 a v4, reordenamiento y guardado atómico. Incluyen guardar 60 productos distintos en un mismo nivel, mover a un nivel con 30 productos y preservar imágenes e identificadores durante la migración. TypeScript y la compilación se ejecutan antes de publicar.
 
-El distintivo **Por contar** describe un conteo físico pendiente; no representa una cantidad calculada ni un módulo de conteo implementado. Se conservan el modelo v3 y los borradores anteriores.
-
-Validación del editor por niveles: búsqueda por SKU, selección, cambio de producto, reordenamiento, cambio de nivel, guardado y recarga, eliminación de ubicación sin cambiar el catálogo, eliminación de nivel vacío, aviso de cambios pendientes y descarte. También se verificó búsqueda y orden en la vista de 390 px, sin desbordamiento horizontal del diálogo. Son pruebas en navegador; no equivalen a pruebas en un teléfono físico.
-
-![Editor por niveles en la vista móvil de prueba](editor-niveles-movil.jpg)
-
-## Unificación visual
-
-Se retiró la demo independiente con navegación antigua y se integró Roles y permisos en el contenedor azul de los editores. La dirección `/permisos` redirige al módulo `/#permissions`; la navegación conserva el borrador y el contexto de la aplicación. El laboratorio conserva los escenarios ficticios del motor de permisos, con búsqueda y filtros; sus selectores no cambian cuentas reales.
-
-Ingreso, recuperación, carga, error, página no encontrada y espacio autenticado reutilizan marca, controles y paleta. Se eliminaron los componentes y estilos sin uso de la primera demo. La persistencia IndexedDB, los datos y el modelo de autorización no se modificaron.
-
-Comprobación visual: entrada por `/permisos`, búsqueda y filtros de autorización, navegación al catálogo y apertura del editor con botones azules; ingreso, recuperación sin token y 404. En móvil de 390 px se verificaron permisos e ingreso sin desbordamiento horizontal. El flujo autenticado completo requiere una base y una cuenta configuradas y no se probó con datos reales.
-
-![Permisos integrados en el diseño actual, con datos ficticios de prueba](permisos-unificado.jpg)
-
-Corrección de acceso a andamios: el clic abre el editor directamente; antes solo seleccionaba el andamio y dejaba el botón de entrada debajo del plano. El plano conserva accesos visibles para abrir, configurar o mover el andamio seleccionado. En un andamio vacío se despliega de entrada el nivel superior para poder agregar el primer producto.
+La nueva prueba visual está pendiente por el bloqueo del navegador de pruebas. Las capturas anteriores en el repositorio reflejan versiones previas. No se ha validado en un teléfono físico ni con una base de producción.

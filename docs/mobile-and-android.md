@@ -41,7 +41,7 @@ Referencia oficial: https://developer.android.com/develop/ui/views/layout/webapp
 
 ## Verificación realizada y límites
 
-- 22 pruebas automatizadas: permisos, catálogo/plano/ubicaciones, migración v2→v3 y ámbito de sucursales.
+- 33 pruebas automatizadas: permisos, catálogo, listas por nivel, migración v2/v3→v4, guardado de 60 productos en un nivel y ámbito de sucursales.
 - Navegador de escritorio y marco móvil de 390 px: navegación inferior, catálogo en tarjetas, creación de producto desde el formulario móvil, creación de sucursal, almacén vinculado y filtro de almacenes por sucursal.
 - Menú Más módulos e instrucciones de instalación comprobados en navegador.
 - TypeScript y compilación Next.js.
