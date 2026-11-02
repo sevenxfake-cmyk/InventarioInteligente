@@ -37,7 +37,7 @@ Se incorporan sucursales, navegación por módulos y adaptación móvil. Los bor
 
 ## Editor de contenido por niveles
 
-Selecciona un andamio en Almacenes y pulsa **Editar contenido**. El editor ancho se adapta a pantalla móvil y permite:
+Haz clic en un andamio del plano de Almacenes para abrir directamente sus niveles. Al cerrar el editor, puedes volver a entrar con **Abrir niveles**, junto al plano. El editor ancho se adapta a pantalla móvil y permite:
 
 - Desplegar o contraer cada nivel; buscar productos activos por nombre, SKU o código de barras y elegir un resultado con su imagen.
 - Cambiar el producto de una ubicación, moverlo a un nivel con espacio libre y reordenarlo con flechas. Se conservan los identificadores de las ubicaciones al moverlas.
@@ -60,3 +60,5 @@ Ingreso, recuperación, carga, error, página no encontrada y espacio autenticad
 Comprobación visual: entrada por `/permisos`, búsqueda y filtros de autorización, navegación al catálogo y apertura del editor con botones azules; ingreso, recuperación sin token y 404. En móvil de 390 px se verificaron permisos e ingreso sin desbordamiento horizontal. El flujo autenticado completo requiere una base y una cuenta configuradas y no se probó con datos reales.
 
 ![Permisos integrados en el diseño actual, con datos ficticios de prueba](permisos-unificado.jpg)
+
+Corrección de acceso a andamios: el clic abre el editor directamente; antes solo seleccionaba el andamio y dejaba el botón de entrada debajo del plano. El plano conserva accesos visibles para abrir, configurar o mover el andamio seleccionado. En un andamio vacío se despliega de entrada el nivel superior para poder agregar el primer producto.

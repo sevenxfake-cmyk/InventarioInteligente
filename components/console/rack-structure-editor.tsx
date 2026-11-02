@@ -14,7 +14,7 @@ export function RackStructureEditor({ rack, warehouse, data, onSave, onClose }: 
 }) {
     const [initial] = useState<RackStructure>(() => ({ levels: rack.levels, slots: rack.slots, placements: data.placements.filter(p => p.rackId === rack.id).map(p => ({ ...p })) }));
     const [structure, setStructure] = useState(initial);
-    const [collapsed, setCollapsed] = useState<number[]>(() => Array.from({ length: rack.levels }, (_, i) => i + 1).filter(level => !initial.placements.some(p => p.level === level)));
+    const [collapsed, setCollapsed] = useState<number[]>(() => Array.from({ length: rack.levels }, (_, i) => i + 1).filter(level => !initial.placements.some(p => p.level === level) && (initial.placements.length > 0 || level !== rack.levels)));
     const [pickerId, setPickerId] = useState<string | null>(null), [query, setQuery] = useState('');
     const [error, setError] = useState(''), [busy, setBusy] = useState(false);
     const errorRef = useRef<HTMLDivElement>(null);
