@@ -36,7 +36,15 @@ export type Rack = {
     slots: number;
     color: string;
 };
+export type Branch = {
+    id: string;
+    companyId: string;
+    name: string;
+    code: string;
+    address: string;
+};
 export type Warehouse = {
+    branchId: string;
     id: string;
     companyId: string;
     name: string;
@@ -62,7 +70,8 @@ export type Change = {
     companyId: string;
 };
 export type Draft = {
-    version: 2;
+    version: 3;
+    branches: Branch[];
     revision: number;
     companies: Company[];
     products: Product[];
@@ -118,3 +127,18 @@ export function validatePlacement(p: Placement, d: Draft) {
         throw new Error('Este espacio ya tiene un producto asignado.');
 }
 export function revise(d: Draft, description: string, companyId: string): Draft { return { ...d, revision: d.revision + 1, changes: [{ id: uid(), at: new Date().toISOString(), description, companyId }, ...d.changes].slice(0, 80) }; }
+export function validateBranch(branch: Branch, data: Draft) {
+    if (!branch.name.trim() || !branch.code.trim())
+        throw new Error('Completa el nombre y código de la sucursal.');
+    if (!data.companies.some(c => c.id === branch.companyId))
+        throw new Error('La sucursal debe pertenecer a una empresa existente.');
+    if (data.branches.some(b => b.id !== branch.id && b.companyId === branch.companyId && b.code.trim().toLowerCase() === branch.code.trim().toLowerCase()))
+        throw new Error('Ese código de sucursal ya existe en esta empresa.');
+}
+export function validateWarehouseBranch(warehouse: Warehouse, data: Draft) {
+    if (!data.branches.some(b => b.id === warehouse.branchId && b.companyId === warehouse.companyId))
+        throw new Error('Selecciona una sucursal de esta empresa.');
+}
+export function warehousesInContext(data: Draft, companyId: string, branchId = 'all') {
+    return data.warehouses.filter(w => w.companyId === companyId && (branchId === 'all' || w.branchId === branchId));
+}

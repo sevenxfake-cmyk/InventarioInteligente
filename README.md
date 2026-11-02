@@ -8,11 +8,13 @@ Una aplicación web para construir tu catálogo, personalizar cada empresa y dis
 
 ### [Abrir Inventario Inteligente en Vercel →](https://inventario-inteligente-snowy.vercel.app/)
 
+[Ver y probar la interfaz móvil →](https://inventario-inteligente-snowy.vercel.app/vista-movil)
+
 Puedes explorar los editores sin crear una cuenta. La aplicación inicia con **datos de ejemplo** para que pruebes las herramientas.
 
 > **Estado: en desarrollo.** Los cambios e imágenes del espacio de prueba se guardan como borradores en el mismo navegador. Todavía no se comparten entre usuarios o dispositivos. El acceso real requiere conectar PostgreSQL y configurar la autenticación.
 
-![Editor visual de almacenes y andamios](docs/editor-almacenes.jpg)
+![Panel con empresa, cargo, sucursal y módulos](docs/erp-desktop-preview.jpg)
 
 *Vista del editor con datos ficticios utilizados durante las pruebas.*
 
@@ -23,6 +25,7 @@ Puedes explorar los editores sin crear una cuenta. La aplicación inicia con **d
 | **Empresas** | Crear y editar datos, añadir logo y portada, elegir un color y consultar sus almacenes y productos. |
 | **Productos** | Crear y editar fichas con imagen, código, categoría, marca, unidad y presentación. Buscar, filtrar y cambiar entre tabla y tarjetas. |
 | **Archivo de productos** | Retirar productos del catálogo activo y restaurarlos después, conservando sus ubicaciones. |
+| **Sucursales** | Crear y editar sedes; filtrar sus almacenes sin mezclar empresas. |
 | **Almacenes** | Crear, configurar y eliminar almacenes con confirmación. Diseñar su distribución en un plano visual. |
 | **Andamios y niveles** | Añadir, mover, duplicar y configurar andamios, niveles y espacios. |
 | **Ubicaciones** | Asociar productos a un nivel y espacio, evitando posiciones ocupadas y cruces entre empresas. |
@@ -43,6 +46,14 @@ Después continuaremos con:
 - Fotografías de evidencia y trabajo sin conexión con sincronización y gestión de conflictos.
 
 Las ubicaciones actuales organizan productos; **no registran conteos ni modifican existencias**. El historial del borrador tampoco sustituye una auditoría autenticada del servidor.
+
+## En computadora y en Android
+
+La interfaz de escritorio muestra empresa, cargo y sucursal junto a los módulos. En móvil tiene navegación inferior, catálogo en tarjetas y formularios adaptados. Puedes usar **Instalar en mi dispositivo** para ver las opciones de instalación web.
+
+El manifiesto, los iconos y la apertura independiente están preparados. **No se ha generado un APK compilado ni firmado.** El inicio requiere conexión; el conteo y la sincronización offline siguen pendientes.
+
+Consulta la [guía de diseño móvil y preparación Android](docs/mobile-and-android.md).
 
 ## Tecnologías
 
@@ -76,7 +87,7 @@ npm run typecheck
 npm run build
 ```
 
-Se incluyen **17 pruebas automatizadas** de permisos y validaciones del catálogo, plano y ubicaciones. Los escenarios A–E verifican reglas de autorización; la integración completa con sesiones, API y PostgreSQL requiere pruebas adicionales.
+Se incluyen **22 pruebas automatizadas** de permisos y validaciones del catálogo, plano y ubicaciones. Los escenarios A–E verifican reglas de autorización; la integración completa con sesiones, API y PostgreSQL requiere pruebas adicionales.
 
 <details>
 <summary><strong>Configurar el acceso real y PostgreSQL</strong></summary>

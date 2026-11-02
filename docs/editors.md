@@ -22,7 +22,7 @@ Las ubicaciones no contienen cantidades: mover o asignar productos no actualiza 
 
 ## Verificación realizada
 
-- 17 pruebas automatizadas: motor de permisos A–E y validaciones del catálogo, plano y ubicaciones.
+- 22 pruebas automatizadas: motor de permisos A–E y validaciones del catálogo, plano y ubicaciones.
 - TypeScript y compilación Next.js.
 - Navegador: crear producto, recargar y encontrarlo; archivar y restaurar; crear andamio de cinco niveles, moverlo y asignar un producto; cargar logo, guardar y comprobar que se conserva al recargar.
 - No se ha probado en un celular físico ni con base PostgreSQL de producción. El modo offline operativo de trabajadores sigue pendiente.
@@ -36,3 +36,7 @@ Conectar los editores a casos de uso del servidor con permisos `products.create/
 La captura incluye los datos ficticios utilizados en las pruebas del navegador.
 
 ![Editor visual de almacenes](editor-almacenes.jpg)
+
+## Actualización v0.3
+
+Se incorporan sucursales, navegación por módulos y adaptación móvil. Los borradores v2 se migran al modelo v3 sin borrar imágenes, productos ni ubicaciones: se crea una sucursal Principal por empresa y se vinculan los almacenes anteriores. La revisión se conserva para seguir detectando ediciones concurrentes. Los datos continúan siendo locales y no representan autorización del servidor. Ver [diseño móvil y Android](mobile-and-android.md).
