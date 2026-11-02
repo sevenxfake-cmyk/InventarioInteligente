@@ -1,4 +1,4 @@
-# Editores y rediseño de la segunda versión
+# Editores y diseño de la aplicación
 
 ## Disponible en el espacio de prueba
 
@@ -18,7 +18,7 @@ Las imágenes JPG/PNG/WebP de hasta 5 MB se decodifican y reducen a 1200 px como
 
 El guardado comprueba una revisión dentro de una transacción IndexedDB: otra pestaña con una versión antigua recibe un conflicto y debe recargar, en vez de sobrescribir cambios. La cuota o bloqueo de almacenamiento produce un error y no una confirmación de guardado. El historial mostrado es local y no equivale a una auditoría de servidor autenticada.
 
-Las ubicaciones no contienen cantidades: mover o asignar productos no actualiza stock ni registra conteos. Los permisos de acceso real no provienen del borrador. La autenticación y las APIs de la primera versión mantienen su separación.
+Las ubicaciones no contienen cantidades: mover o asignar productos no actualiza stock ni registra conteos. Los permisos de acceso real no provienen del borrador. La autenticación y las APIs protegidas mantienen su separación.
 
 ## Verificación realizada
 
@@ -30,12 +30,6 @@ Las ubicaciones no contienen cantidades: mover o asignar productos no actualiza 
 ## Próxima integración
 
 Conectar los editores a casos de uso del servidor con permisos `products.create/edit/archive`, `warehouses.manage` y `placements.manage`, ámbitos por empresa y almacén, control de versiones y auditoría transaccional. Las fotografías requieren un proveedor de objetos. La edición colaborativa real no debe activarse usando el borrador del navegador como base principal.
-
-## Vista del editor
-
-La captura incluye los datos ficticios utilizados en las pruebas del navegador.
-
-![Editor visual de almacenes](editor-almacenes.jpg)
 
 ## Actualización v0.3
 
@@ -56,3 +50,13 @@ El distintivo **Por contar** describe un conteo físico pendiente; no representa
 Validación del editor por niveles: búsqueda por SKU, selección, cambio de producto, reordenamiento, cambio de nivel, guardado y recarga, eliminación de ubicación sin cambiar el catálogo, eliminación de nivel vacío, aviso de cambios pendientes y descarte. También se verificó búsqueda y orden en la vista de 390 px, sin desbordamiento horizontal del diálogo. Son pruebas en navegador; no equivalen a pruebas en un teléfono físico.
 
 ![Editor por niveles en la vista móvil de prueba](editor-niveles-movil.jpg)
+
+## Unificación visual
+
+Se retiró la demo independiente con navegación antigua y se integró Roles y permisos en el contenedor azul de los editores. La dirección `/permisos` redirige al módulo `/#permissions`; la navegación conserva el borrador y el contexto de la aplicación. El laboratorio conserva los escenarios ficticios del motor de permisos, con búsqueda y filtros; sus selectores no cambian cuentas reales.
+
+Ingreso, recuperación, carga, error, página no encontrada y espacio autenticado reutilizan marca, controles y paleta. Se eliminaron los componentes y estilos sin uso de la primera demo. La persistencia IndexedDB, los datos y el modelo de autorización no se modificaron.
+
+Comprobación visual: entrada por `/permisos`, búsqueda y filtros de autorización, navegación al catálogo y apertura del editor con botones azules; ingreso, recuperación sin token y 404. En móvil de 390 px se verificaron permisos e ingreso sin desbordamiento horizontal. El flujo autenticado completo requiere una base y una cuenta configuradas y no se probó con datos reales.
+
+![Permisos integrados en el diseño actual, con datos ficticios de prueba](permisos-unificado.jpg)

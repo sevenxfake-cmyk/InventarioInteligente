@@ -1,2 +1,6 @@
 'use client';
-export default function ErrorPage({reset}:{reset:()=>void}){return <main className="mx-auto max-w-lg p-10"><h1 className="text-xl font-semibold">No pudimos cargar este espacio.</h1><p className="my-5 text-sm leading-6 text-slate-500">Revisa tu conexión. Si el problema continúa, contacta al administrador para verificar los servicios de acceso y datos.</p><button className="btn" onClick={reset}>Intentar nuevamente</button></main>}
+import { RotateCcw } from 'lucide-react';
+import AccountFrame from '@/components/account-frame';
+export default function ErrorPage({ reset }: { reset: () => void }) {
+    return <AccountFrame title="No pudimos cargar este espacio" description="Revisa tu conexión y vuelve a intentarlo. Si continúa, contacta al administrador." eyebrow="RECUPERAR EL ESPACIO"><button className="primary-button account-continue" onClick={reset}><RotateCcw size={16}/>Intentar nuevamente</button></AccountFrame>;
+}

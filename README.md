@@ -30,7 +30,9 @@ Puedes explorar los editores sin crear una cuenta. La aplicación inicia con **d
 | **Andamios y niveles** | Añadir, mover, duplicar y configurar andamios, niveles y espacios. |
 | **Ubicaciones** | Asociar productos a un nivel y espacio, evitando posiciones ocupadas y cruces entre empresas. |
 | **Actividad** | Consultar los cambios del borrador y descargar una copia de sus datos en JSON. |
-| **Permisos** | Explorar ejemplos de acceso por persona y empresa en el [laboratorio de permisos](https://inventario-inteligente-snowy.vercel.app/permisos). |
+| **Permisos** | Explorar y filtrar ejemplos de acceso por persona, empresa y almacén dentro del mismo diseño en el [laboratorio de permisos](https://inventario-inteligente-snowy.vercel.app/permisos). |
+
+La navegación, permisos, acceso, recuperación y pantallas de carga comparten la identidad visual actual. La antigua demo independiente fue retirada; `/permisos` abre el módulo integrado.
 
 Los formularios advierten si intentas cerrar con cambios sin guardar. Los editores comprueban códigos duplicados, posiciones ocupadas y reducciones de niveles que dejarían productos sin una ubicación válida.
 
@@ -87,7 +89,7 @@ npm run typecheck
 npm run build
 ```
 
-Se incluyen **22 pruebas automatizadas** de permisos y validaciones del catálogo, plano y ubicaciones. Los escenarios A–E verifican reglas de autorización; la integración completa con sesiones, API y PostgreSQL requiere pruebas adicionales.
+Se incluyen **29 pruebas automatizadas** de permisos y validaciones del catálogo, plano y ubicaciones. Los escenarios A–E verifican reglas de autorización; la integración completa con sesiones, API y PostgreSQL requiere pruebas adicionales.
 
 <details>
 <summary><strong>Configurar el acceso real y PostgreSQL</strong></summary>

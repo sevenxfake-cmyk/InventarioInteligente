@@ -1,3 +1,4 @@
-import {Suspense} from 'react';
+import { Suspense } from 'react';
 import ResetForm from '@/components/reset-form';
-export default function Page(){return <Suspense fallback={<p className="p-8">Cargando…</p>}><ResetForm/></Suspense>}
+import AppStatus from '@/components/app-status';
+export default function Page() { return <Suspense fallback={<AppStatus/>}><ResetForm/></Suspense>; }

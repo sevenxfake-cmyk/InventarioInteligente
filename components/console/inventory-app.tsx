@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { ArrowDownToLine, Check, Database, Layers3, Plus, X } from 'lucide-react';
+import { ArrowDownToLine, Check, Database, Plus, X } from 'lucide-react';
 import { capacity, revise, validateProduct, validateRack, validateWarehouse, type Company, type Draft, type Product, type Rack, type Warehouse, } from '@/lib/console/model';
 import { applyRackStructure, type RackStructure } from '@/lib/console/rack-structure';
 import { createSeed } from '@/lib/console/seed';
@@ -11,6 +11,8 @@ import { WarehouseEditor, Warehouses } from './warehouses';
 import { Drawer, Empty } from './ui';
 import ConsoleShell, { modules } from './shell';
 import Dashboard from './dashboard';
+import Permissions from './permissions';
+import AppStatus from '../app-status';
 import { Branches, BranchEditor } from './branches';
 import { validateBranch, validateWarehouseBranch, warehousesInContext, type Branch } from '@/lib/console/model';
 type Editor = {
@@ -68,7 +70,7 @@ export default function InventoryApp() {
     }, [busy]);
     const company = data.companies.find(c => c.id === companyId) ?? data.companies[0], products = data.products.filter(p => p.companyId === company?.id && !p.archived), warehouses = warehousesInContext(data, company?.id, branchId);
     function navigate(id: string) { setSection(id); setEditor(null); window.location.hash = id; window.scrollTo({ top: 0, behavior: 'auto' }); }
-    useEffect(() => { const sync = () => { const id = window.location.hash.slice(1); if (modules.some(m => m.id === id))
+    useEffect(() => { const sync = () => { const id = window.location.hash.slice(1); if (modules.some(m => m.id === id) || id === 'permissions')
         setSection(id);
     else
         setSection('overview'); }; sync(); window.addEventListener('hashchange', sync); return () => window.removeEventListener('hashchange', sync); }, []);
@@ -112,14 +114,16 @@ export default function InventoryApp() {
         products: { title: 'Productos del catálogo', description: 'El catálogo es compartido por las sucursales de esta empresa.' },
         warehouses: { title: 'Almacenes y andamios', description: 'Diseña el plano y organiza niveles, espacios y productos.' },
         branches: { title: 'Sucursales de la empresa', description: 'Cada sede con su propia dirección y almacenes.' },
-        activity: { title: 'Actividad del borrador', description: 'Cambios guardados en este navegador.' }
+        activity: { title: 'Actividad del borrador', description: 'Cambios guardados en este navegador.' },
+        permissions: { title: 'Roles y permisos', description: 'Consulta qué puede hacer cada persona y en qué ámbito.' }
     };
     if (!loaded)
-        return <main className="flex min-h-screen items-center justify-center gap-3 bg-[#f5f7fa] text-sm font-semibold text-emerald-800"><Layers3 size={23} className="animate-pulse"/>Preparando tu espacio de trabajo…</main>;
+        return <AppStatus message="Preparando tu espacio de trabajo…"/>;
     return <><ConsoleShell company={company} companies={data.companies} branches={data.branches.filter(b => b.companyId === company.id)} branchId={branchId} section={section} busy={busy} savedAt={savedAt} productCount={products.length} onCompanyChange={id => { setCompanyId(id); setBranchId('all'); setEditor(null); }} onBranchChange={setBranchId} onNavigate={navigate} onEditCompany={() => setEditor({ kind: 'company', value: company })}>
- <div className="erp-page-heading"><div><p className="eyebrow">{section === 'overview' ? 'CENTRO DE OPERACIONES' : modules.find(m => m.id === section)?.name.toUpperCase()}</p><h1>{headings[section]?.title}</h1><p>{headings[section]?.description}</p></div>{section !== 'activity' && section !== 'overview' && <button className="primary-button" onClick={action}><Plus size={17}/>{actionLabel}</button>}</div>
+ <div className="erp-page-heading"><div><p className="eyebrow">{section === 'overview' ? 'CENTRO DE OPERACIONES' : section === 'permissions' ? 'ACCESOS Y RESPONSABILIDADES' : modules.find(m => m.id === section)?.name.toUpperCase()}</p><h1>{headings[section]?.title}</h1><p>{headings[section]?.description}</p></div>{section !== 'activity' && section !== 'overview' && section !== 'permissions' && <button className="primary-button" onClick={action}><Plus size={17}/>{actionLabel}</button>}</div>
  <div className="erp-draft-strip"><span className="status-dot"/><span>Espacio de prueba · Cambios guardados en este navegador</span><span className="draft-strip-right">{busy ? 'Guardando…' : savedAt ? 'Guardado local' : 'Datos de ejemplo'}</span></div>
  {storageError && <p role="alert" className="mb-5 rounded-xl bg-rose-50 p-4 text-sm text-rose-700">{storageError}</p>}
+ {section === 'permissions' && <Permissions/>}
  {section === 'overview' && <Dashboard data={data} company={company} products={products} warehouses={warehouses} branchId={branchId} onNavigate={navigate} onEditCompany={() => setEditor({ kind: 'company', value: company })} onEditProduct={p => setEditor({ kind: 'product', value: p })}/>}
  {section === 'companies' && <Companies data={data} onEdit={c => setEditor({ kind: 'company', value: c })} onNew={() => setEditor({ kind: 'company', value: null })} onSelect={id => { setCompanyId(id); setBranchId('all'); navigate('overview'); }}/>}
  {section === 'branches' && <Branches data={data} companyId={company.id} onEdit={b => setEditor({ kind: 'branch', value: b })} onNew={() => setEditor({ kind: 'branch', value: null })} onOpen={id => { setBranchId(id); navigate('warehouses'); }}/>}

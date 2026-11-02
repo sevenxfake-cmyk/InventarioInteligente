@@ -1,0 +1,8 @@
+import Link from 'next/link';
+import { ArrowLeft, Building2, Layers3, Package, ShieldCheck, Warehouse } from 'lucide-react';
+import AppBrand from './app-brand';
+export default function AccountFrame({ title, description, children, eyebrow = 'ACCESO A TU ORGANIZACIÓN' }: {
+    title: string; description: string; children: React.ReactNode; eyebrow?: string;
+}) {
+    return <main className="account-layout"><section className="account-brand-panel"><AppBrand/><div className="account-intro"><span className="account-overline">CADA ESPACIO, EN ORDEN</span><h2>Tus empresas.<br/>Tu inventario.<br/><span>Un mismo lugar.</span></h2><p>Organiza tu catálogo y diseña tus almacenes con una experiencia clara en cada pantalla.</p><div className="account-modules">{[{ icon: Building2, name: 'Empresas', tone: 'violet' }, { icon: Package, name: 'Productos', tone: 'teal' }, { icon: Warehouse, name: 'Almacenes', tone: 'sky' }].map(m => <div key={m.name}><span className={`module-symbol ${m.tone}`}><m.icon size={22}/></span><span>{m.name}</span></div>)}</div></div><small><Layers3 size={16}/>Inventario Inteligente · Gestión de almacenes</small></section><section className="account-main"><nav aria-label="Navegación de acceso"><Link href="/"><ArrowLeft size={15}/>Volver a la aplicación</Link><Link href="/permisos"><ShieldCheck size={15}/>Permisos</Link></nav><div className="account-card panel"><div className="account-card-heading"><p className="eyebrow">{eyebrow}</p><h1>{title}</h1><p>{description}</p></div>{children}</div><footer>Inventario Inteligente · Gestión de almacenes</footer></section></main>;
+}
